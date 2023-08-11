@@ -66,18 +66,18 @@ $ vim add.md
 
 ```bash
 $ cd kernels
-$ mkdir add  // 添加以算子名命名的目录
-$ cd add
-$ touch add.cpp // add.cpp  ->  mluop 接口的实现文件
-$ touch add.h   // add.h    ->  kernel 接口声明文件
-$ touch add.mlu // add.mlu  ->  以 bangc 编程的 kernel 函数的实现文件
+$ mkdir abs  // 添加以算子名命名的目录
+$ cd abs
+$ touch abs.cpp // abs.cpp  ->  mluop 接口的实现文件
+$ touch abs.h   // abs.h    ->  kernel 接口声明文件
+$ touch abs.mlu // abs.mlu  ->  以 bangc 编程的 kernel 函数的实现文件
 $ cd ../../
 $ mlu_op.h // mluop 接口声明文件
 ```
 
 文件命名及组织规则为：
 
-1. cpp 及 h 文件的文件名为算子名，如 add.cpp / add.h.
+1. cpp 及 h 文件的文件名为算子名，如 abs.cpp / abs.h.
 
 2. mlu 文件根据算子的实现以 "算子名 + 实现方式" 的规则进行命名。如算子的实现方式为以 Union1 为最小单位，需命名为 add_union1.mlu，如以 Union2 为最小单位，需命名为 add_union2.mlu.
 
