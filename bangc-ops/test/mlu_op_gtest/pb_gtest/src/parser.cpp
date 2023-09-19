@@ -991,7 +991,7 @@ bool Parser::readMessageFromFile(const std::string &filename, Node *proto) {
   google::protobuf::io::FileInputStream input(fd);
   if (strEndsWith(filename, ".pb")) {
     google::protobuf::io::CodedInputStream coded_input(&input);
-    coded_input.SetTotalBytesLimit(INT_MAX, INT_MAX - 1);
+    coded_input.SetTotalBytesLimit(INT_MAX);
     status = proto->ParseFromCodedStream(&coded_input);
   } else if (strEndsWith(filename, ".prototxt")) {
     status = google::protobuf::TextFormat::Parse(&input, proto);
