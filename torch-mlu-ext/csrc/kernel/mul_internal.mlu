@@ -1,0 +1,83 @@
+// #include <stdio.h>
+#include <mlu.h>
+
+#define NRAM_SIZE ((512-64)*1024)
+__nram__ char nram_buffer[NRAM_SIZE];
+
+#ifndef PAD_UP
+#define PAD_UP(x,y) (((x) / (y) + (int)((x) % (y) > 0)) *(y))
+#endif
+
+#if __BANG_ARCH__ > 300
+
+template <typename T>
+__mlu_func__ void bang_mul_template(void *a, void *b, void *c, int32_t size)
+{
+    int task_size = PAD_UP(size / taskDim, 64);
+    int ptr_offset = task_size * taskId;
+    if(ptr_offset > size)
+        return;
+    T *a_ptr = (T*)a + ptr_offset;
+    T *b_ptr = (T*)b + ptr_offset;
+    T *c_ptr = (T*)c + ptr_offset;
+
+    int loop_size = NRAM_SIZE / 2 / sizeof(T);
+    task_size = ptr_offset+task_size > size ? size-ptr_offset : task_size;
+    int remain_n = task_size % loop_size;
+    int loop_n = task_size / loop_size + (remain_n==0 ? 0 : 1);
+
+    // int debugId=0;
+    // __bang_printf("%s, %d %d \n", __FUNCTION__, taskId, debugId++);
+    int nram_offset = 0;
+    T *a_nram = (T*)nram_buffer + nram_offset; nram_offset += loop_size;
+    T *b_nram = (T*)nram_buffer + nram_offset; nram_offset += loop_size;
+    // T *c_nram = (T*)nram_buffer + nram_offset; nram_offset += loop_size;
+    int gdram_offset = 0;
+    // __bang_printf("%s, %d %d %d \n", __FUNCTION__, taskId, debugId++, loop_n);
+    for(int i=0; i<loop_n; i++)
+    {
+        if(i == loop_n-1)
+            loop_size = remain_n;
+        __memcpy(a_nram, a_ptr + gdram_offset, loop_size*sizeof(T), GDRAM2NRAM);
+        __memcpy(b_nram, b_ptr + gdram_offset, loop_size*sizeof(T), GDRAM2NRAM);
+        // __bang_printf("%s, %d %d %d \n", __FUNCTION__, taskId, debugId++, loop_size);
+
+        __bang_mul(a_nram, a_nram, b_nram, loop_size);
+        // __bang_printf("%s, %d %d %d \n", __FUNCTION__, taskId, debugId++, loop_size);
+
+        __memcpy(c_ptr + gdram_offset, a_nram, loop_size*sizeof(T), NRAM2GDRAM);
+    }
+
+}
+#endif
+
+
+__mlu_global__ void bang_mul_kernel(void *a, void *b, void *c, int32_t size, cnrtDataType_t dtype)
+{
+    if(coreId == 0x80)
+        return ;
+#if __BANG_ARCH__ > 300
+    switch (dtype)
+    {
+    case CNRT_FLOAT32:
+        bang_mul_template<float>(a, b, c, size);
+        break;
+    case CNRT_FLOAT16:
+        bang_mul_template<half>(a, b, c, size);
+        break;
+
+    default:
+        break;
+    }
+#endif
+}
+
+
+void bang_mul_element(void *a, void *b, void *c, int32_t size,
+                    cnrtDim3_t dim3, cnrtFunctionType_t ktype,
+                    cnrtQueue_t queue, cnrtDataType_t dtype)
+{
+    bang_mul_kernel<<<dim3, ktype, queue>>>(a, b, c, size, dtype);
+}
+
+

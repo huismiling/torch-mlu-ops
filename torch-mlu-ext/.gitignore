@@ -1,0 +1,14 @@
+**.pyc
+**__pycache__
+
+build/
+
+.vscode/
+
+**.so
+dist/
+*.egg-info/
+
+**.o
+
+**cndump
