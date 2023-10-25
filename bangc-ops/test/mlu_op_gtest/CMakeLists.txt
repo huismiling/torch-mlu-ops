@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 message(STATUS "[MLUOP GTEST STYLE]: ")
 set(MLUOP_BUILD_SPECIFIC_OP ${MLUOP_BUILD_SPECIFIC_OP})
 
-execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/gtest_style.py ${MLUOP_BUILD_SPECIFIC_OP} RESULT_VARIABLE STYLE_CHECK)
+execute_process(COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/tools/gtest_style.py ${MLUOP_BUILD_SPECIFIC_OP} RESULT_VARIABLE STYLE_CHECK)
 if (STYLE_CHECK)
   message(FATAL_ERROR "-- Pleace check gtest code manually.")
 endif()
@@ -16,7 +16,7 @@ endif()
 message(STATUS "[MLUOP GTEST REGISTER OP]: ")
 file(GLOB CASE_LIST "${CMAKE_CURRENT_SOURCE_DIR}/pb_gtest/src/gtest/*case_list.cpp")
 execute_process(COMMAND rm -f ${CASE_LIST})
-execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/pb_gtest/src/gtest/register_op.py ${MLUOP_BUILD_SPECIFIC_OP})
+execute_process(COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/pb_gtest/src/gtest/register_op.py ${MLUOP_BUILD_SPECIFIC_OP})
 
 
 ## Try to find libxml2 and protobuf

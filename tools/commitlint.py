@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # Copyright (C) [2022] by Cambricon, Inc.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -26,7 +26,7 @@ import sys
 import re
 
 types = ('[Feature]', '[Fix]', '[Docs]', '[TEST]', '[WIP]')
-scopes = ('(bangc-ops)', '(bangpy-ops)','(mlu-ops)')
+scopes = ('(bangc-ops)', '(bangpy-ops)','(mlu-ops)','(torch-ops)')
 
 #get header
 def get_commit_msg(msg):

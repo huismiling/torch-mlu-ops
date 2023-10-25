@@ -1,5 +1,5 @@
 #! /bin/bash
-set -e
+set -ex
 
 SCRIPT_DIR=`dirname $0`
 BUILD_PATH=${SCRIPT_DIR}/build
@@ -412,4 +412,4 @@ pushd ${BUILD_PATH} > /dev/null
                 -DMLUOP_SYMBOL_VIS_FILE="${MLUOP_SYMBOL_VIS_FILE}"
 
 popd > /dev/null
-${CMAKE} --build ${BUILD_PATH} --  -j${BUILD_JOBS}
+${CMAKE} --build ${BUILD_PATH} --  -j${BUILD_JOBS} VERBOSE=1
