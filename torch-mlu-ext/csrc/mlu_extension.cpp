@@ -3,8 +3,8 @@
 
 #include "ATen/Tensor.h"
 
-#include "aten/utils/types.h"
-#include "aten/utils/tensor_util.h"
+#include "aten/util/types.h"
+#include "aten/util/tensor_util.h"
 #include "aten/cnnl/cnnlHandle.h"
 #include "aten/operators/bang/bang_kernel.h"
 #include "aten/operators/bang/internal/bang_internal.h"
@@ -18,7 +18,7 @@ void bang_mul_element(void *a, void *b, void *c, int32_t size,
 at::Tensor get_contiguous(const at::Tensor& input,
                            c10::MemoryFormat memory_format = c10::MemoryFormat::Contiguous)
 {
-    auto out = torch_mlu::cnnl_contiguous(input, memory_format);
+    auto out = torch_mlu::cnnl::ops::cnnl_contiguous(input, memory_format);
     return out;
 }
 
@@ -37,7 +37,7 @@ torch::Tensor cmul_element(const torch::Tensor &x, const torch::Tensor &y)
 
     int32_t size = x_contiguous.numel();
 
-    cnrtDataType_t dtype = cnnlType2CnrtType(getCnnlType(x_impl));
+    cnrtDataType_t dtype = fromCnnlType2CnrtType(getCnnlType(x_impl));
     cnrtDim3_t taskDim = {32, 1, 1};
     cnrtFunctionType_t ktype = CNRT_FUNC_TYPE_BLOCK;
 

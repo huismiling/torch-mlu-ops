@@ -21,7 +21,7 @@ mlu_extension = MLUExtension(
                             ],
                         "cncc":[
                             "-O3",
-                            # "--bang-mlu-arch=mtp_372",
+                            "--bang-mlu-arch=mtp_372",
                             "--bang-mlu-arch=mtp_592",
                             ]
                     }

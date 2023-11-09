@@ -32,9 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ATen/NativeFunctions.h"
 #include "ATen/Tensor.h"
 
-#include "aten/utils/types.h"
-#include "aten/utils/tensor_util.h"
-#include "aten/utils/internal_util.h"
+#include "aten/util/types.h"
+#include "aten/util/tensor_util.h"
+#include "aten/cnnl/cnnlHandle.h"
+#include "aten/cnnl/cnnl_util.h"
 #include "aten/cnnl/cnnlCommonDescriptors.h"
 #include "aten/cnnl/cnnlTensorDescriptors.h"
 #include "aten/cnnl/cnnlOpDescriptors.h"
@@ -82,7 +83,7 @@ std::tuple<at::Tensor, bool> getMMInput(const at::Tensor &self) {
       return std::make_tuple(self.t(), is_trans_self);
     } else {
       is_trans_self = false;
-      return std::make_tuple(cnnl_contiguous(self, c10::MemoryFormat::Contiguous), is_trans_self);
+      return std::make_tuple(torch_mlu::cnnl::ops::cnnl_contiguous(self, c10::MemoryFormat::Contiguous), is_trans_self);
     }
 }
 
@@ -292,7 +293,7 @@ at::Tensor cnnl_mm(const at::Tensor &self, const at::Tensor &other,
                   "None-Floating-Point supported device.");
   return cnnl_mm_internal(self_contiguous, other_contiguous,
                           self_contiguous.options(), is_trans_self, is_trans_other,
-                          torch_mlu::Global::instance().allowCNNLTF32(),
+                          torch_mlu::Global::instance().allowCNNLMatmulTF32(),
                           self_scale, other_scale);
 }
 
